@@ -4,11 +4,11 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
 
 # SYNOPSIS
 
-use Getopt::EX::Loader;
-my $rcloader = new Getopt::EX::Loader
-    BASECLASS => \[ 'App::Greple', 'Getopt::EX' \];
+    use Getopt::EX::Loader;
+    my $rcloader = new Getopt::EX::Loader
+        BASECLASS => [ 'App::command', 'Getopt::EX' ];
 
-command -Mautocolor
+    $ command -Mautocolor
 
 # VERSION
 

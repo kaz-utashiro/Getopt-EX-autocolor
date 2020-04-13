@@ -54,6 +54,17 @@
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaz-utashiro/Getopt-EX-autocolor.git",
+         "web" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor"
+      }
+   },
    "version" : "0.01",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
