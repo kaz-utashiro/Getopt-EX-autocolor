@@ -121,11 +121,6 @@ sub rgb_to_brightness {
     int(($r * 30 + $g * 59 + $b * 11) / $max); # 0 .. 100
 }
 
-my %TERM_PROGRAM = qw(
-    Apple_Terminal	Apple_Terminal
-    iTerm.app		iTerm
-    );
-
 sub call(&@) { $_[0]->(@_[1..$#_]) }
 
 sub finalize {
@@ -143,7 +138,8 @@ sub finalize {
 	    return $v;
 	}
 	if (my $term_program = $ENV{TERM_PROGRAM}) {
-	    my $mod = __PACKAGE__ . "::$term_program";
+	    my $submod = $term_program =~ s/\.app$//r;
+	    my $mod = __PACKAGE__ . "::$submod";
 	    my $brightness = "$mod\::brightness";
 	    no strict 'refs';
 	    if (eval "require $mod" and defined &$brightness) {
