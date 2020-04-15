@@ -100,8 +100,6 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use App::Greple::Common;
-
 our $VERSION = "0.02";
 
 use Exporter 'import';
@@ -170,7 +168,6 @@ use List::Util qw(pairgrep);
 
 sub set {
     my %arg = @_;
-    my $filename = delete $arg{&FILELABEL};
     %param = (%param, pairgrep { exists $param{$a} } %arg);
 }
 
