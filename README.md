@@ -12,7 +12,7 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # DESCRIPTION
 
@@ -49,7 +49,7 @@ default values.
 For example, use like:
 
     option default \
-        -Mautocolor::set(default=100,light=--light,dark=--dark) \
+        -Mautocolor::set(default=100,light=--light,dark=--dark)
 
 # FUNCTIONS
 
@@ -58,11 +58,11 @@ For example, use like:
     This exportable function caliculates brightness (luminane) from RGB
     values.  It accepts three parameters of 0 to 65535 integer.
 
-    Maximum value can be specified by the first hash argument.
+    Maximum value can be specified by optional hash argument.
 
         rgb_to_brightness( { max => 255 }, 255, 255, 255);
 
-    Brightness is caliculated from RGB values by next equation.
+    Brightness is caliculated from RGB values by this equation.
 
         Y = 0.30 * R + 0.59 * G + 0.11 * B
 
