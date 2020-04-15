@@ -14,7 +14,7 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ L<Getopt::EX>
 
 L<Getopt::EX::autocolor::Apple_Terminal>
 
-L<Getopt::EX::autocolor::iTerm2>
+L<Getopt::EX::autocolor::iTerm>
 
 =head1 AUTHOR
 
@@ -100,7 +100,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Exporter 'import';
 our @EXPORT      = qw();

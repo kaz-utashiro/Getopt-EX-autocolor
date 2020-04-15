@@ -12,7 +12,7 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # DESCRIPTION
 
@@ -72,7 +72,7 @@ For example, use like:
 
 [Getopt::EX::autocolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::autocolor::Apple_Terminal)
 
-[Getopt::EX::autocolor::iTerm2](https://metacpan.org/pod/Getopt::EX::autocolor::iTerm2)
+[Getopt::EX::autocolor::iTerm](https://metacpan.org/pod/Getopt::EX::autocolor::iTerm)
 
 # AUTHOR
 
