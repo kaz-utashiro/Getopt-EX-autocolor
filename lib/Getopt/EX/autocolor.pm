@@ -115,8 +115,8 @@ our %param = (
     );
 
 sub rgb_to_brightness {
-    my %opt = ref $_[0] ? shift : {};
-    my $max = $opt{max} || 65535;
+    my $opt = ref $_[0] ? shift : {};
+    my $max = $opt->{max} || 65535;
     my($r, $g, $b) = @_;
     int(($r * 30 + $g * 59 + $b * 11) / $max); # 0 .. 100
 }
