@@ -1,5 +1,5 @@
 {
-   "abstract" : "Getopt::EX autocolor module",
+   "abstract" : "Getopt::EX termcolor module",
    "author" : [
       "Kazumasa Utashiro"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Getopt-EX-autocolor",
+   "name" : "Getopt-EX-termcolor",
    "no_index" : {
       "directory" : [
          "t",
@@ -57,13 +57,13 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor/issues"
+         "web" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor/issues"
       },
-      "homepage" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor",
+      "homepage" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/kaz-utashiro/Getopt-EX-autocolor.git",
-         "web" : "https://github.com/kaz-utashiro/Getopt-EX-autocolor"
+         "url" : "git://github.com/kaz-utashiro/Getopt-EX-termcolor.git",
+         "web" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor"
       }
    },
    "version" : "0.04",

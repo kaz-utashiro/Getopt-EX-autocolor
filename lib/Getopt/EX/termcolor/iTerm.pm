@@ -1,28 +1,28 @@
 =head1 NAME
 
-Getopt::EX::autocolor::iTerm
+Getopt::EX::termcolor::iTerm
 
 =head1 SYNOPSIS
 
-command -Mautocolor::iTerm
+command -Mtermcolor::iTerm
 
 =head1 DESCRIPTION
 
-This is a L<Getopt::EX::autocolor> module for iTerm.
+This is a L<Getopt::EX::termcolor> module for iTerm.
 
 =head1 SEE ALSO
 
-L<Getopt::EX::autocolor>
+L<Getopt::EX::termcolor>
 
 =cut
 
-package Getopt::EX::autocolor::iTerm;
+package Getopt::EX::termcolor::iTerm;
 
 use strict;
 use warnings;
 use Data::Dumper;
 
-use Getopt::EX::autocolor qw(rgb_to_brightness);
+use Getopt::EX::termcolor qw(rgb_to_brightness);
 use App::cdif::Command::OSAscript;
 
 {

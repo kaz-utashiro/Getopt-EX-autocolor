@@ -1,28 +1,28 @@
 =head1 NAME
 
-Getopt::EX::autocolor::Apple_Terminal
+Getopt::EX::termcolor::Apple_Terminal
 
 =head1 SYNOPSIS
 
-command -Mautocolor::Apple_Terminal
+command -Mtermcolor::Apple_Terminal
 
 =head1 DESCRIPTION
 
-This is a L<Getopt::EX::autocolor> module for Apple_Terminal.
+This is a L<Getopt::EX::termcolor> module for Apple_Terminal.
 
 =head1 SEE ALSO
 
-L<Getopt::EX::autocolor>
+L<Getopt::EX::termcolor>
 
 =cut
 
-package Getopt::EX::autocolor::Apple_Terminal;
+package Getopt::EX::termcolor::Apple_Terminal;
 
 use strict;
 use warnings;
 use Data::Dumper;
 
-use Getopt::EX::autocolor qw(rgb_to_brightness);
+use Getopt::EX::termcolor qw(rgb_to_brightness);
 
 sub rgb {
     my $app = "Terminal";

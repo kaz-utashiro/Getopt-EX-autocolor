@@ -1,7 +1,7 @@
 use strict;
 use Test::More 0.98;
 
-use Getopt::EX::autocolor qw(rgb_to_brightness);
+use Getopt::EX::termcolor qw(rgb_to_brightness);
 
 is(rgb_to_brightness(65535, 65535, 65535), 100, "white");
 is(rgb_to_brightness(65535,     0,     0),  30, "red");

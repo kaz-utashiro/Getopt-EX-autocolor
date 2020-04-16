@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Getopt::EX::autocolor - Getopt::EX autocolor module
+Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
     my $rcloader = new Getopt::EX::Loader
         BASECLASS => [ 'App::command', 'Getopt::EX' ];
 
-    $ command -Mautocolor
+    $ command -Mtermcolor
 
 =head1 VERSION
 
@@ -19,10 +19,10 @@ Version 0.04
 =head1 DESCRIPTION
 
 This is a common module for command using L<Getopt::EX> to set system
-dependent autocolor option.
+dependent termcolor option.
 
-Actual action is done by sub-module under L<Getopt::EX::autocolor>,
-such as L<Getopt::EX::autocolor::Apple_Terminal>.
+Actual action is done by sub-module under L<Getopt::EX::termcolor>,
+such as L<Getopt::EX::termcolor::Apple_Terminal>.
 
 Each sub-module is expected to have C<&brightness> function which
 returns integer value between 0 and 100.  If the sub-module was found
@@ -51,7 +51,7 @@ default values.
 For example, use like:
 
     option default \
-        -Mautocolor::set(default=100,light=--light,dark=--dark)
+        -Mtermcolor::set(default=100,light=--light,dark=--dark)
 
 =head1 FUNCTIONS
 
@@ -76,9 +76,9 @@ Brightness is caliculated from RGB values by this equation.
 
 L<Getopt::EX>
 
-L<Getopt::EX::autocolor::Apple_Terminal>
+L<Getopt::EX::termcolor::Apple_Terminal>
 
-L<Getopt::EX::autocolor::iTerm>
+L<Getopt::EX::termcolor::iTerm>
 
 =head1 AUTHOR
 
@@ -93,7 +93,7 @@ as Perl itself.
 
 =cut
 
-package Getopt::EX::autocolor;
+package Getopt::EX::termcolor;
 
 use v5.14;
 use strict;
@@ -171,4 +171,4 @@ sub set {
 
 __DATA__
 
-#  LocalWords:  autocolor
+#  LocalWords:  termcolor

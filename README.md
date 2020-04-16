@@ -1,6 +1,6 @@
 # NAME
 
-Getopt::EX::autocolor - Getopt::EX autocolor module
+Getopt::EX::termcolor - Getopt::EX termcolor module
 
 # SYNOPSIS
 
@@ -8,7 +8,7 @@ Getopt::EX::autocolor - Getopt::EX autocolor module
     my $rcloader = new Getopt::EX::Loader
         BASECLASS => [ 'App::command', 'Getopt::EX' ];
 
-    $ command -Mautocolor
+    $ command -Mtermcolor
 
 # VERSION
 
@@ -17,10 +17,10 @@ Version 0.04
 # DESCRIPTION
 
 This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to set system
-dependent autocolor option.
+dependent termcolor option.
 
-Actual action is done by sub-module under [Getopt::EX::autocolor](https://metacpan.org/pod/Getopt::EX::autocolor),
-such as [Getopt::EX::autocolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::autocolor::Apple_Terminal).
+Actual action is done by sub-module under [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt::EX::termcolor),
+such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal).
 
 Each sub-module is expected to have `&brightness` function which
 returns integer value between 0 and 100.  If the sub-module was found
@@ -49,7 +49,7 @@ default values.
 For example, use like:
 
     option default \
-        -Mautocolor::set(default=100,light=--light,dark=--dark)
+        -Mtermcolor::set(default=100,light=--light,dark=--dark)
 
 # FUNCTIONS
 
@@ -70,9 +70,9 @@ For example, use like:
 
 [Getopt::EX](https://metacpan.org/pod/Getopt::EX)
 
-[Getopt::EX::autocolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::autocolor::Apple_Terminal)
+[Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt::EX::termcolor::Apple_Terminal)
 
-[Getopt::EX::autocolor::iTerm](https://metacpan.org/pod/Getopt::EX::autocolor::iTerm)
+[Getopt::EX::termcolor::iTerm](https://metacpan.org/pod/Getopt::EX::termcolor::iTerm)
 
 # AUTHOR
 
