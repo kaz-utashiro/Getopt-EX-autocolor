@@ -14,7 +14,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 0.04
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -100,7 +100,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.04";
+our $VERSION = "1.01";
 
 use Exporter 'import';
 our @EXPORT      = qw();
