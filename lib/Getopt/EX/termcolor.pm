@@ -134,34 +134,21 @@ sub rgb_to_brightness {
     int(($r * 30 + $g * 59 + $b * 11) / $max); # 0 .. 100
 }
 
-sub call(&@) { $_[0]->(@_[1..$#_]) }
-
 my $mod;
 my $argv;
 
 sub initialize {
     ($mod, $argv) = @_;
+    set_brightness();
 }
 
-use List::Util qw(pairgrep);
-
-my %bg_param = (
-    light => "--light-terminal",
-    dark  => "--dark-terminal",
-    default => undef,
-    threshold => 50,
-    );
-
-sub bg {
-    my %arg = @_;
-    %bg_param = (%bg_param,
-		 pairgrep { exists $bg_param{$a} } %arg);
-
-    # default to do nothing.
-    $mod->setopt($bg_param{light} => '$<move(0,0)>');
-    $mod->setopt($bg_param{dark}  => '$<move(0,0)>');
-
-    my $brightness = call {
+sub set_brightness {
+    if (defined $ENV{TERM_BRIGHTNESS}) { return }
+    if (defined $ENV{BRIGHTNESS}) {
+	$ENV{TERM_BRIGHTNESS} = $ENV{BRIGHTNESS};
+	return;
+    }
+    my $brightness = sub {
 	my $v = $ENV{TERM_BRIGHTNESS} // $ENV{BRIGHTNESS};
 	if (defined $v && $v =~ /^\d+$/
 	    && 0 <= $v && $v <= 100
@@ -181,9 +168,36 @@ sub bg {
 	    }
 	}
 	undef;
-    };
+    }->();
+    $ENV{TERM_BRIGHTNESS} = $brightness // return;
+}
 
-    $brightness //= $bg_param{default} // return;
+use List::Util qw(pairgrep);
+
+#
+# FOR BACKWARD COMPATIBILITY
+# DEPELICATED IN THE FUTURE
+#
+sub set { goto &bg }
+
+my %bg_param = (
+    light => "--light-terminal",
+    dark  => "--dark-terminal",
+    default => undef,
+    threshold => 50,
+    );
+
+sub bg {
+    my %arg = @_;
+    %bg_param = (%bg_param,
+		 pairgrep { exists $bg_param{$a} } %arg);
+
+    (my $brightness = $ENV{TERM_BRIGHTNESS})
+	//= $bg_param{default} // return;
+
+    # default to do nothing.
+    $mod->setopt($bg_param{light} => '$<move(0,0)>');
+    $mod->setopt($bg_param{dark}  => '$<move(0,0)>');
 
     $mod->setopt(default =>
 		 $brightness > $bg_param{threshold}
