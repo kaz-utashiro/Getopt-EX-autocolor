@@ -207,7 +207,7 @@ sub bg {
     my $option = $brightness > $param{threshold} ?
 	$param{light} : $param{dark};
 
-    $mod->setopt($option => '$<move(0,0)>');
+#   $mod->setopt($option => '$<move(0,0)>');
     $mod->setopt(default => $option);
 }
 
