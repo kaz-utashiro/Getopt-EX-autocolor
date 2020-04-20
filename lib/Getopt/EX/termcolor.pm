@@ -41,6 +41,11 @@ However, if the environment variable C<TERM_BRIGHTNESS> is defined,
 its value is used as a brightness without calling sub-modules.  The
 value of C<TERM_BRIGHTNESS> is expected in range of 0 to 100.
 
+You can set C<TERM_BRIGHTNESS> in you start up file of shell, like:
+
+    export TERM_BRIGHTNESS=`perl -MGetopt::EX::termcolor=brightness -e brightness`
+    : ${TERM_BRIGHTNESS:=100}
+
 =head1 MODULE FUNCTION
 
 =over 7
@@ -125,7 +130,7 @@ our $VERSION = "1.02";
 use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw(rgb_to_brightness);
+our @EXPORT_OK   = qw(rgb_to_brightness brightness);
 
 sub rgb_to_brightness {
     my $opt = ref $_[0] ? shift : {};
@@ -142,34 +147,41 @@ sub initialize {
     set_brightness();
 }
 
+our $debug = 0;
+
+sub debug {
+    $debug ^= 1;
+}
+
 sub set_brightness {
-    if (defined $ENV{TERM_BRIGHTNESS}) { return }
+    if (defined $ENV{TERM_BRIGHTNESS}) {
+	warn "TERM_BRIGHTNESS=$ENV{TERM_BRIGHTNESS}\n" if $debug;
+	return;
+    }
     if (defined $ENV{BRIGHTNESS}) {
+	warn "BRIGHTNESS=$ENV{BRIGHTNESS}\n" if $debug;
 	$ENV{TERM_BRIGHTNESS} = $ENV{BRIGHTNESS};
 	return;
     }
-    my $brightness = sub {
-	my $v = $ENV{TERM_BRIGHTNESS} // $ENV{BRIGHTNESS};
-	if (defined $v && $v =~ /^\d+$/
-	    && 0 <= $v && $v <= 100
-	    ) {
-	    return $v;
-	}
-	if (my $term_program = $ENV{TERM_PROGRAM}) {
-	    my $submod = $term_program =~ s/\.app$//r;
-	    my $mod = __PACKAGE__ . "::$submod";
-	    my $brightness = "$mod\::brightness";
-	    no strict 'refs';
-	    if (eval "require $mod" and defined &$brightness) {
-		my $v = &$brightness;
-		if (0 <= $v and $v <= 100) {
-		    return $v;
-		}
+    my $brightness = get_brightness();
+    $ENV{TERM_BRIGHTNESS} = $brightness // return;
+}
+
+sub get_brightness {
+    if (my $term_program = $ENV{TERM_PROGRAM}) {
+	warn "TERM_PROGRAM=$ENV{TERM_PROGRAM}\n" if $debug;
+	my $submod = $term_program =~ s/\.app$//r;
+	my $mod = __PACKAGE__ . "::$submod";
+	my $brightness = "$mod\::brightness";
+	no strict 'refs';
+	if (eval "require $mod" and defined &$brightness) {
+	    my $v = &$brightness;
+	    if (0 <= $v and $v <= 100) {
+		return $v;
 	    }
 	}
-	undef;
-    }->();
-    $ENV{TERM_BRIGHTNESS} = $brightness // return;
+    }
+    undef;
 }
 
 use List::Util qw(pairgrep);
@@ -188,21 +200,20 @@ my %bg_param = (
     );
 
 sub bg {
-    my %arg = @_;
-    %bg_param = (%bg_param,
-		 pairgrep { exists $bg_param{$a} } %arg);
+    my %param =
+	(%bg_param, pairgrep { exists $bg_param{$a} } @_);
+    my $brightness =
+	$ENV{TERM_BRIGHTNESS} // $param{default} // return;
+    my $option = $brightness > $param{threshold} ?
+	$param{light} : $param{dark};
 
-    (my $brightness = $ENV{TERM_BRIGHTNESS})
-	//= $bg_param{default} // return;
+    $mod->setopt($option => '$<move(0,0)>');
+    $mod->setopt(default => $option);
+}
 
-    # default to do nothing.
-    $mod->setopt($bg_param{light} => '$<move(0,0)>');
-    $mod->setopt($bg_param{dark}  => '$<move(0,0)>');
-
-    $mod->setopt(default =>
-		 $brightness > $bg_param{threshold}
-		 ? $bg_param{light}
-		 : $bg_param{dark});
+sub brightness {
+    my $brightness = get_brightness() // return;
+    say $brightness;
 }
 
 1;
