@@ -64,8 +64,7 @@ sub background_rgb {
     my $script = $script{background};
     my $result = App::cdif::Command::OSAscript->new->exec($script);
     my @rgb = $result =~ /(\d+)/g;
-    warn Dumper $script, $result, \@rgb if $debug;
-    @rgb;
+    @rgb == 3 ? ( { max => 65535 }, @rgb) : ();
 }
 
 1;

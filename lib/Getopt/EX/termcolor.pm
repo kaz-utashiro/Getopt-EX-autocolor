@@ -32,23 +32,39 @@ Actual action is done by sub-module under L<Getopt::EX::termcolor>,
 such as L<Getopt::EX::termcolor::Apple_Terminal>.
 
 Each sub-module is expected to have C<&get_color> function which
-returns RGB value list between 0 and 65535.  If the sub-module was
-found and C<&get_color> function exists, its result with C<background>
-parameter is taken as a background color of the terminal.
+return the list of RGB values for requested name, but currently name
+C<background> is only supported.  Each RGB values are expected in a
+range of 0 to 255 by default.  If the list first entry is a HASH
+reference, it may include maximum number indication like C<< { max =>
+65535 } >>.
 
-Luminance is caliculated from RGB values by this equation and produces
-decimal value from 0 to 100.
+Terminal luminance is calculated from RGB values by this equation and
+produces decimal value from 0 to 100.
 
-    ( 30 * R + 59 * G + 11 * B ) / 65535
+    ( 30 * R + 59 * G + 11 * B ) / MAX
+
+=begin comment
 
 If the environment variable C<TERM_LUMINANCE> is defined, its value is
 used as a luminance without calling sub-modules.  The value of
 C<TERM_LUMINANCE> is expected in range of 0 to 100.
 
-You can set C<TERM_LUMINANCE> in you start up file of shell, like:
+=end comment
 
-    export TERM_LUMINANCE=`perl -MGetopt::EX::termcolor=luminance -e luminance`
-    : ${TERM_LUMINANCE:=100}
+If the environment variable C<TERM_BGCOLOR> is defined, it is used as
+a background RGB value without calling sub-modules.  RGB value is a
+combination of integer described in 24bit/12bit hex or 24bit decimal
+format.
+
+    24bit hex     #000000 .. #FFFFFF
+    12bit hex     #000 .. #FFF
+    24bit decimal 0,0,0 .. 255,255,255
+
+You can set C<TERM_BGCOLOR> in you start up file of shell.  This
+module has utility function C<bgcolor> which can be used like this:
+
+    export TERM_BGCOLOR=`perl -MGetopt::EX::termcolor=bgcolor -e bgcolor`
+    : ${TERM_BGCOLOR:=#FFFFFF}
 
 =head1 MODULE FUNCTION
 
@@ -60,7 +76,7 @@ Call this function with module option:
 
     $ command -Mtermcolor::bg=
 
-If the terminal luminance is unkown, nothing happens.  Otherwise, the
+If the terminal luminance is unknown, nothing happens.  Otherwise, the
 module insert B<--light-terminal> or B<--dark-terminal> option
 according to the luminance value.  These options are defined as
 C$<move(0,0)> in this module and do nothing.  They can be overridden
@@ -115,7 +131,7 @@ our $VERSION = "1.02";
 use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw(rgb_to_luminance rgb_to_brightness luminance);
+our @EXPORT_OK   = qw(rgb_to_luminance rgb_to_brightness luminance bgcolor);
 
 #
 # For backward compatibility.
@@ -125,10 +141,12 @@ sub rgb_to_brightness {
 }
 
 sub rgb_to_luminance {
+    @_ or return;
     my $opt = ref $_[0] ? shift : {};
-    my $max = $opt->{max} || 65535;
+    my $max = $opt->{max} || 255;
     my($r, $g, $b) = @_;
-    int(($r * 30 + $g * 59 + $b * 11) / $max); # 0 .. 100
+    use integer;
+    ($r * 30 + $g * 59 + $b * 11) / $max; # 0 .. 100
 }
 
 my $mod;
@@ -145,26 +163,8 @@ sub debug {
     $debug ^= 1;
 }
 
-sub set_luminance {
-    if (defined $ENV{TERM_LUMINANCE}) {
-	warn "TERM_LUMINANCE=$ENV{TERM_LUMINANCE}\n" if $debug;
-	return;
-    }
-    if (defined $ENV{TERM_BRIGHTNESS}) {
-	warn "TERM_BRIGHTNESS=$ENV{TERM_BRIGHTNESS}\n" if $debug;
-	$ENV{TERM_LUMINANCE} = $ENV{TERM_BRIGHTNESS};
-	return;
-    }
-    if (defined $ENV{BRIGHTNESS}) {
-	warn "BRIGHTNESS=$ENV{BRIGHTNESS}\n" if $debug;
-	$ENV{TERM_LUMINANCE} = $ENV{BRIGHTNESS};
-	return;
-    }
-    my $brightness = get_luminance();
-    $ENV{TERM_LUMINANCE} = $brightness // return;
-}
-
-sub get_luminance {
+sub get_rgb {
+    my $cat = shift;
     if (my $term_program = $ENV{TERM_PROGRAM}) {
 	warn "TERM_PROGRAM=$ENV{TERM_PROGRAM}\n" if $debug;
 	my $submod = $term_program =~ s/\.app$//r;
@@ -172,13 +172,45 @@ sub get_luminance {
 	my $get_color = "$mod\::get_color";
 	if (eval "require $mod" and defined &$get_color) {
 	    no strict 'refs';
-	    my @rgb = $get_color->('background');
-	    if (@rgb >= 3) {
-		return rgb_to_luminance(@rgb);
-	    }
+	    my @rgb = $get_color->($cat);
+	    return () if @rgb < 3;
+	    my $opt = ref $rgb[0] ? shift @rgb : {};
+	    my $max = $opt->{max} // 255;
+	    @rgb = map { int($_ * 255 / $max) } @rgb if $max != 255;
+	    return @rgb;
 	}
     }
-    undef;
+    ();
+}
+
+sub set_luminance {
+    my $brightness;
+    if (defined $ENV{TERM_LUMINANCE}) {
+	warn "TERM_LUMINANCE=$ENV{TERM_LUMINANCE}\n" if $debug;
+	return;
+    }
+    if ("BACKWARD COMPATIBILITY") {
+	if (defined $ENV{BRIGHTNESS}) {
+	    warn "BRIGHTNESS=$ENV{BRIGHTNESS}\n" if $debug;
+	    $ENV{TERM_LUMINANCE} = $ENV{BRIGHTNESS};
+	    return;
+	}
+    }
+    if (my $bgcolor = $ENV{TERM_BGCOLOR}) {
+	warn "TERM_BGCOLOR=$ENV{TERM_BGCOLOR}\n" if $debug;
+	if (my @rgb = parse_rgb($bgcolor)) {
+	    $brightness = rgb_to_luminance @rgb;
+	} else {
+	    warn "Invalid format: TERM_BGCOLOR=$bgcolor\n";
+	}
+    } else {
+	$brightness = get_luminance();
+    }
+    $ENV{TERM_LUMINANCE} = $brightness // return;
+}
+
+sub get_luminance {
+    rgb_to_luminance get_rgb "background";
 }
 
 use List::Util qw(pairgrep);
@@ -208,13 +240,40 @@ sub bg {
     $mod->setopt(default => $option);
 }
 
+sub parse_rgb {
+    my $rgb = shift;
+    my @rgb = do {
+	if    ($rgb =~ /^\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i) {
+	    map { hex } $1, $2, $3;
+	}
+	elsif ($rgb =~ /^\#([\da-f])([\da-f])([\da-f])$/i) {
+	    map { 0x11 * hex } $1, $2, $3;
+	}
+	elsif ($rgb =~ /^([0-5])([0-5])([0-5])$/) {
+	    map { 0x33 * int } $1, $2, $3;
+	}
+	elsif ($rgb =~ /^(\d+),(\d+),(\d+)$/) {
+	    map { int } $1, $2, $3;
+	}
+	else {
+	    return ();
+	}
+    };
+    @rgb;
+}
+
 sub luminance {
-    my $l = get_luminance() // return;
-    say $l;
+    my $v = get_luminance() // return;
+    say $v;
+}
+
+sub bgcolor {
+    my @rgb = get_rgb "background" or return;
+    printf "#%02X%02X%02X\n", @rgb;
 }
 
 1;
 
 __DATA__
 
-#  LocalWords:  termcolor
+#  LocalWords:  termcolor RGB

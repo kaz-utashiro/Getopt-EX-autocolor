@@ -43,7 +43,8 @@ sub background_rgb {
     my $app = "Terminal";
     my $do = "background color of first window";
     my $bg = qx{osascript -e \'tell application \"$app\" to $do\'};
-    $bg =~ /(\d+)/g;
+    my @rgb = $bg =~ /(\d+)/g;
+    @rgb == 3 ? ( { max => 65535 }, @rgb) : ();
 }
 
 1;
