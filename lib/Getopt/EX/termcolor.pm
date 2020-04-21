@@ -4,6 +4,10 @@
 
 Getopt::EX::termcolor - Getopt::EX termcolor module
 
+=head1 VERSION
+
+Version 1.02
+
 =head1 SYNOPSIS
 
     use Getopt::EX::Loader;
@@ -19,10 +23,6 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
     $ command -Mtermcolor::bg=
 
-=head1 VERSION
-
-Version 1.02
-
 =head1 DESCRIPTION
 
 This is a common module for command using L<Getopt::EX> to manipulate
@@ -31,20 +31,24 @@ system dependent terminal color.
 Actual action is done by sub-module under L<Getopt::EX::termcolor>,
 such as L<Getopt::EX::termcolor::Apple_Terminal>.
 
-At this point, only terminal background color is supported.  Each
-sub-module is expected to have C<&brightness> function which returns
-integer value between 0 and 100.  If the sub-module was found and
-C<&brightness> function exists, its result is taken as a brightness of
-the terminal.
+Each sub-module is expected to have C<&get_color> function which
+returns RGB value list between 0 and 65535.  If the sub-module was
+found and C<&get_color> function exists, its result with C<background>
+parameter is taken as a background color of the terminal.
 
-However, if the environment variable C<TERM_BRIGHTNESS> is defined,
-its value is used as a brightness without calling sub-modules.  The
-value of C<TERM_BRIGHTNESS> is expected in range of 0 to 100.
+Luminance is caliculated from RGB values by this equation and produces
+decimal value from 0 to 100.
 
-You can set C<TERM_BRIGHTNESS> in you start up file of shell, like:
+    ( 30 * R + 59 * G + 11 * B ) / 65535
 
-    export TERM_BRIGHTNESS=`perl -MGetopt::EX::termcolor=brightness -e brightness`
-    : ${TERM_BRIGHTNESS:=100}
+If the environment variable C<TERM_LUMINANCE> is defined, its value is
+used as a luminance without calling sub-modules.  The value of
+C<TERM_LUMINANCE> is expected in range of 0 to 100.
+
+You can set C<TERM_LUMINANCE> in you start up file of shell, like:
+
+    export TERM_LUMINANCE=`perl -MGetopt::EX::termcolor=luminance -e luminance`
+    : ${TERM_LUMINANCE:=100}
 
 =head1 MODULE FUNCTION
 
@@ -56,9 +60,9 @@ Call this function with module option:
 
     $ command -Mtermcolor::bg=
 
-If the terminal brightness is unkown, nothing happens.  Otherwise, the
+If the terminal luminance is unkown, nothing happens.  Otherwise, the
 module insert B<--light-terminal> or B<--dark-terminal> option
-according to the brightness value.  These options are defined as
+according to the luminance value.  These options are defined as
 C$<move(0,0)> in this module and do nothing.  They can be overridden
 by other module or user definition.
 
@@ -67,7 +71,7 @@ with module option.  It takes some parameters and they override
 default values.
 
     threshold : threshold of light/dark  (default 50)
-    default   : default brightness value (default none)
+    default   : default luminance value  (default none)
     light     : light terminal option    (default "--light-terminal")
     dark      : dark terminal option     (default "--dark-terminal")
 
@@ -75,25 +79,6 @@ Use like this:
 
     option default \
         -Mtermcolor::bg(default=100,light=--light,dark=--dark)
-
-=back
-
-=head1 UTILITY FUNCTION
-
-=over 7
-
-=item B<rgb_to_brightness>
-
-This exportable function caliculates brightness (luminane) from RGB
-values.  It accepts three parameters of 0 to 65535 integer.
-
-Maximum value can be specified by optional hash argument.
-
-    rgb_to_brightness( { max => 255 }, 255, 255, 255);
-
-Brightness is caliculated from RGB values by this equation.
-
-    Y = 0.30 * R + 0.59 * G + 0.11 * B
 
 =back
 
@@ -130,9 +115,16 @@ our $VERSION = "1.02";
 use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = ();
-our @EXPORT_OK   = qw(rgb_to_brightness brightness);
+our @EXPORT_OK   = qw(rgb_to_luminance rgb_to_brightness luminance);
 
+#
+# For backward compatibility.
+#
 sub rgb_to_brightness {
+    goto &rgb_to_luminance;
+}
+
+sub rgb_to_luminance {
     my $opt = ref $_[0] ? shift : {};
     my $max = $opt->{max} || 65535;
     my($r, $g, $b) = @_;
@@ -144,7 +136,7 @@ my $argv;
 
 sub initialize {
     ($mod, $argv) = @_;
-    set_brightness();
+    set_luminance();
 }
 
 our $debug = 0;
@@ -153,31 +145,36 @@ sub debug {
     $debug ^= 1;
 }
 
-sub set_brightness {
+sub set_luminance {
+    if (defined $ENV{TERM_LUMINANCE}) {
+	warn "TERM_LUMINANCE=$ENV{TERM_LUMINANCE}\n" if $debug;
+	return;
+    }
     if (defined $ENV{TERM_BRIGHTNESS}) {
 	warn "TERM_BRIGHTNESS=$ENV{TERM_BRIGHTNESS}\n" if $debug;
+	$ENV{TERM_LUMINANCE} = $ENV{TERM_BRIGHTNESS};
 	return;
     }
     if (defined $ENV{BRIGHTNESS}) {
 	warn "BRIGHTNESS=$ENV{BRIGHTNESS}\n" if $debug;
-	$ENV{TERM_BRIGHTNESS} = $ENV{BRIGHTNESS};
+	$ENV{TERM_LUMINANCE} = $ENV{BRIGHTNESS};
 	return;
     }
-    my $brightness = get_brightness();
-    $ENV{TERM_BRIGHTNESS} = $brightness // return;
+    my $brightness = get_luminance();
+    $ENV{TERM_LUMINANCE} = $brightness // return;
 }
 
-sub get_brightness {
+sub get_luminance {
     if (my $term_program = $ENV{TERM_PROGRAM}) {
 	warn "TERM_PROGRAM=$ENV{TERM_PROGRAM}\n" if $debug;
 	my $submod = $term_program =~ s/\.app$//r;
 	my $mod = __PACKAGE__ . "::$submod";
-	my $brightness = "$mod\::brightness";
-	no strict 'refs';
-	if (eval "require $mod" and defined &$brightness) {
-	    my $v = &$brightness;
-	    if (0 <= $v and $v <= 100) {
-		return $v;
+	my $get_color = "$mod\::get_color";
+	if (eval "require $mod" and defined &$get_color) {
+	    no strict 'refs';
+	    my @rgb = $get_color->('background');
+	    if (@rgb >= 3) {
+		return rgb_to_luminance(@rgb);
 	    }
 	}
     }
@@ -202,18 +199,18 @@ my %bg_param = (
 sub bg {
     my %param =
 	(%bg_param, pairgrep { exists $bg_param{$a} } @_);
-    my $brightness =
-	$ENV{TERM_BRIGHTNESS} // $param{default} // return;
-    my $option = $brightness > $param{threshold} ?
+    my $luminance =
+	$ENV{TERM_LUMINANCE} // $param{default} // return;
+    my $option = $luminance > $param{threshold} ?
 	$param{light} : $param{dark};
 
 #   $mod->setopt($option => '$<move(0,0)>');
     $mod->setopt(default => $option);
 }
 
-sub brightness {
-    my $brightness = get_brightness() // return;
-    say $brightness;
+sub luminance {
+    my $l = get_luminance() // return;
+    say $l;
 }
 
 1;
