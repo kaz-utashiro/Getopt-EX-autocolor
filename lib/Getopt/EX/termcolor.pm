@@ -78,13 +78,9 @@ Call this function with module option:
 
 If the terminal luminance is unknown, nothing happens.  Otherwise, the
 module insert B<--light-terminal> or B<--dark-terminal> option
-according to the luminance value.  These options are defined as
-C$<move(0,0)> in this module and do nothing.  They can be overridden
-by other module or user definition.
+according to the luminance value.
 
-You can change the behavior of this module by calling C<&set> function
-with module option.  It takes some parameters and they override
-default values.
+You can change the behavior by optional parameters:
 
     threshold : threshold of light/dark  (default 50)
     default   : default luminance value  (default none)
@@ -106,6 +102,8 @@ L<Getopt::EX::termcolor::Apple_Terminal>
 
 L<Getopt::EX::termcolor::iTerm>
 
+L<Getopt::EX::termcolor::XTerm>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -124,6 +122,7 @@ package Getopt::EX::termcolor;
 use v5.14;
 use strict;
 use warnings;
+use Carp;
 use Data::Dumper;
 
 our $VERSION = "1.02";
@@ -163,50 +162,75 @@ sub debug {
     $debug ^= 1;
 }
 
-sub get_rgb {
-    my $cat = shift;
-    if (my $term_program = $ENV{TERM_PROGRAM}) {
-	warn "TERM_PROGRAM=$ENV{TERM_PROGRAM}\n" if $debug;
-	my $submod = $term_program =~ s/\.app$//r;
-	my $mod = __PACKAGE__ . "::$submod";
-	my $get_color = "$mod\::get_color";
-	if (eval "require $mod" and defined &$get_color) {
-	    no strict 'refs';
-	    my @rgb = $get_color->($cat);
-	    return () if @rgb < 3;
-	    my $opt = ref $rgb[0] ? shift @rgb : {};
-	    my $max = $opt->{max} // 255;
-	    @rgb = map { int($_ * 255 / $max) } @rgb if $max != 255;
-	    return @rgb;
+sub call_mod_sub {
+    my($mod, $name, @arg) = @_;
+    my $call = "$mod\::$name";
+    if (eval "require $mod" and defined &$call) {
+	no strict 'refs';
+	$call->(@arg);
+    } else {
+	if ($@ !~ /^Can't locate /) {
+	    croak $@;
 	}
     }
-    ();
+}
+
+sub rgb255 {
+    use integer;
+    my $opt = ref $_[0] ? shift : {};
+    my $max = $opt->{max} // 255;
+    map { $_ * 255 / $max } @_;
+}
+
+sub get_rgb {
+    my $cat = shift;    
+    my @rgb;
+  RGB:
+    {
+	# TERM=xterm
+	if ($ENV{TERM} // '' =~ /\bxterm-256color\b/) {
+	    my $mod = __PACKAGE__ . "::XTerm";
+	    @rgb = call_mod_sub $mod, 'get_color', $cat;
+	    last if @rgb >= 3;
+	}
+	# TERM_PROGRAM
+	if (my $term_program = $ENV{TERM_PROGRAM}) {
+	    warn "TERM_PROGRAM=$ENV{TERM_PROGRAM}\n" if $debug;
+	    my $submod = $term_program =~ s/\.app$//r;
+	    my $mod = __PACKAGE__ . "::$submod";
+	    @rgb = call_mod_sub $mod, 'get_color', $cat;
+	    last if @rgb >= 3;
+	}
+	return ();
+    }
+  GOTCHA:
+    rgb255 @rgb;
 }
 
 sub set_luminance {
-    my $brightness;
+    my $luminance;
     if (defined $ENV{TERM_LUMINANCE}) {
 	warn "TERM_LUMINANCE=$ENV{TERM_LUMINANCE}\n" if $debug;
 	return;
     }
     if ("BACKWARD COMPATIBILITY") {
-	if (defined $ENV{BRIGHTNESS}) {
-	    warn "BRIGHTNESS=$ENV{BRIGHTNESS}\n" if $debug;
-	    $ENV{TERM_LUMINANCE} = $ENV{BRIGHTNESS};
+	if (defined (my $env = $ENV{BRIGHTNESS})) {
+	    warn "BRIGHTNESS=$env\n" if $debug;
+	    $ENV{TERM_LUMINANCE} = $env;
 	    return;
 	}
     }
     if (my $bgcolor = $ENV{TERM_BGCOLOR}) {
-	warn "TERM_BGCOLOR=$ENV{TERM_BGCOLOR}\n" if $debug;
+	warn "TERM_BGCOLOR=$bgcolor\n" if $debug;
 	if (my @rgb = parse_rgb($bgcolor)) {
-	    $brightness = rgb_to_luminance @rgb;
+	    $luminance = rgb_to_luminance @rgb;
 	} else {
 	    warn "Invalid format: TERM_BGCOLOR=$bgcolor\n";
 	}
     } else {
-	$brightness = get_luminance();
+	$luminance = get_luminance();
     }
-    $ENV{TERM_LUMINANCE} = $brightness // return;
+    $ENV{TERM_LUMINANCE} = $luminance // return;
 }
 
 sub get_luminance {

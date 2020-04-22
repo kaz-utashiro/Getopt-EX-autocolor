@@ -45,6 +45,7 @@
             "App::sdif" : "v4.13.7",
             "Getopt::EX" : "v1.16.0",
             "List::Util" : "1.45",
+            "Term::ReadKey" : "0",
             "perl" : "v5.14.0"
          }
       },

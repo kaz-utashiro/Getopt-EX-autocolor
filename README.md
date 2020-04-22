@@ -92,6 +92,8 @@ module has utility function `bgcolor` which can be used like this:
 
 [Getopt::EX::termcolor::iTerm](https://metacpan.org/pod/Getopt::EX::termcolor::iTerm)
 
+[Getopt::EX::termcolor::XTerm](https://metacpan.org/pod/Getopt::EX::termcolor::XTerm)
+
 # AUTHOR
 
 Kazumasa Utashiro
