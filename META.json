@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::sdif" : "v4.13.7",
+            "Capture::Tiny" : "0",
             "Getopt::EX" : "v1.16.0",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",

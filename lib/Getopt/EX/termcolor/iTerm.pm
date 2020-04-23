@@ -22,9 +22,6 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Getopt::EX::termcolor qw(rgb_to_luminance);
-use App::cdif::Command::OSAscript;
-
 {
     no warnings 'once';
     use Getopt::EX::Colormap;
@@ -60,10 +57,15 @@ END
 
     );
 
+use Capture::Tiny ':all';
+
 sub background_rgb {
     my $script = $script{background};
-    my $result = App::cdif::Command::OSAscript->new->exec($script);
-    my @rgb = $result =~ /(\d+)/g;
+    my($stdout, $stderr, $exit) = capture {
+	system 'osascript', '-e', $script;
+    };
+    $exit == 0 or return;
+    my @rgb = $stdout =~ /(\d+)/g;
     @rgb == 3 ? ( { max => 65535 }, @rgb) : ();
 }
 

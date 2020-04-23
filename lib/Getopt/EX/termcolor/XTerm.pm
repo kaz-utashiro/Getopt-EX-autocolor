@@ -95,6 +95,8 @@ my $osc_st_re = qr/[\a\x9c]|\e\\/;
 my $osc_answer_re = qr/\e\]\d+;(?<answer>[\x08-\x13\x20-\x7d]*)(?:$osc_st_re)/;
 
 sub osc_answer {
+    @_ or return;
+    defined $_[0] or return;
     $_[0] =~ $osc_answer_re and $+{answer};
 }
 
@@ -132,7 +134,7 @@ use List::Util qw(max);
 
 sub color_rgb {
     my $name = shift;
-    my $rgb = osc_answer ask osc_stp $name;
+    my $rgb = osc_answer ask osc_stp $name or return;
     my @rgb = $rgb =~ m{rgb:([\da-f]+)/([\da-f]+)/([\da-f]+)}i or return;
     my $max = (2 ** (length($1) * 4)) - 1;
     my @opt = $max == 255 ? () : ( { max => $max } );

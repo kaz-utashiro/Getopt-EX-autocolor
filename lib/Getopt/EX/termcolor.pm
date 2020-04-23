@@ -188,7 +188,7 @@ sub get_rgb {
   RGB:
     {
 	# TERM=xterm
-	if ($ENV{TERM} // '' =~ /\bxterm-256color\b/) {
+	if (($ENV{TERM} // '') =~ /\bxterm-256color\b/) {
 	    my $mod = __PACKAGE__ . "::XTerm";
 	    @rgb = call_mod_sub $mod, 'get_color', $cat;
 	    last if @rgb >= 3;
