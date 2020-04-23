@@ -124,7 +124,7 @@ sub ask {
 	    __PACKAGE__,
 	    uncntrl $answer;
     }
-    ReadMode "restore", $tty; 
+    ReadMode "restore", $tty;
     return $answer;
 }
 

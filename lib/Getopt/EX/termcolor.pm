@@ -183,7 +183,7 @@ sub rgb255 {
 }
 
 sub get_rgb {
-    my $cat = shift;    
+    my $cat = shift;
     my @rgb;
   RGB:
     {
