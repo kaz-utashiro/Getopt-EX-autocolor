@@ -2,6 +2,11 @@ Revision history for Getopt-EX extension Getopt-EX-termcolor
 
 {{$NEXT}}
 
+1.04 2020-04-23T15:45:42Z
+
+    - Fix bug about $ENV{TERM}.
+    - Stop to depend on App::cdif::Command.
+
 1.03 2020-04-23T08:13:28Z
 
     - Implement XTerm.pm using operating system command sequence.

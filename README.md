@@ -4,7 +4,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
