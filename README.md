@@ -4,7 +4,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -66,13 +66,9 @@ module has utility function `bgcolor` which can be used like this:
 
     If the terminal luminance is unknown, nothing happens.  Otherwise, the
     module insert **--light-terminal** or **--dark-terminal** option
-    according to the luminance value.  These options are defined as
-    C$<move(0,0)> in this module and do nothing.  They can be overridden
-    by other module or user definition.
+    according to the luminance value.
 
-    You can change the behavior of this module by calling `&set` function
-    with module option.  It takes some parameters and they override
-    default values.
+    You can change the behavior by optional parameters:
 
         threshold : threshold of light/dark  (default 50)
         default   : default luminance value  (default none)

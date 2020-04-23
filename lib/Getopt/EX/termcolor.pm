@@ -6,7 +6,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ use warnings;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use Exporter 'import';
 our @EXPORT      = qw();
