@@ -260,9 +260,10 @@ sub bg {
     my $luminance =
 	$ENV{TERM_LUMINANCE} // $param{default} // return;
     my $option = $luminance > $param{threshold} ?
-	$param{light} : $param{dark};
+	$param{light} : $param{dark}
+    or return;
 
-#   $mod->setopt($option => '$<move(0,0)>');
+#   $mod->setopt($option => '$<ignore>');
     $mod->setopt(default => $option);
 }
 
