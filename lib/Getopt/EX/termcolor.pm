@@ -11,8 +11,9 @@ Version 1.06
 =head1 SYNOPSIS
 
     use Getopt::EX::Loader;
-    my $rcloader = new Getopt::EX::Loader
-        BASECLASS => [ 'App::command', 'Getopt::EX' ];
+    my $rcloader = Getopt::EX::Loader->new(
+        BASECLASS => [ 'App::command', 'Getopt::EX' ],
+        );
 
     or
 
@@ -119,15 +120,14 @@ as Perl itself.
 
 =cut
 
+use v5.14;
 package Getopt::EX::termcolor;
 
-use v5.14;
-use strict;
+our $VERSION = '1.06';
+
 use warnings;
 use Carp;
 use Data::Dumper;
-
-our $VERSION = "1.06";
 
 use Exporter 'import';
 our @EXPORT      = qw();

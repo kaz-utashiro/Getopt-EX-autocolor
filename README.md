@@ -9,8 +9,9 @@ Version 1.06
 # SYNOPSIS
 
     use Getopt::EX::Loader;
-    my $rcloader = new Getopt::EX::Loader
-        BASECLASS => [ 'App::command', 'Getopt::EX' ];
+    my $rcloader = Getopt::EX::Loader->new(
+        BASECLASS => [ 'App::command', 'Getopt::EX' ],
+        );
 
     or
 
