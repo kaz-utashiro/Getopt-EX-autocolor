@@ -2,10 +2,6 @@
 
 Getopt::EX::termcolor - Getopt::EX termcolor module
 
-# VERSION
-
-Version 1.07
-
 # SYNOPSIS
 
     use Getopt::EX::Loader;
@@ -22,6 +18,10 @@ Version 1.07
 
     $ command -Mtermcolor::bg=
 
+# VERSION
+
+Version 1.07
+
 # DESCRIPTION
 
 This is a common module for command using [Getopt::EX](https://metacpan.org/pod/Getopt::EX) to manipulate
@@ -33,9 +33,9 @@ such as [Getopt::EX::termcolor::Apple\_Terminal](https://metacpan.org/pod/Getopt
 Each sub-module is expected to have `&get_color` function which
 return the list of RGB values for requested name, but currently name
 `background` is only supported.  Each RGB values are expected in a
-range of 0 to 255 by default.  If the list first entry is a HASH
-reference, it may include maximum number indication like `{ max =>
-65535 }`.
+range of 0 to 255 by default.  If the first entry of the list is a
+HASH reference, it may include maximum number indication like `{
+max => 65535 }`.
 
 Terminal luminance is calculated from RGB values by this equation and
 produces decimal value from 0 to 100.
@@ -99,7 +99,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright (C) 2020 Kazumasa Utashiro.
+Copyright 2020-2021 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
