@@ -22,7 +22,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =head1 DESCRIPTION
 
@@ -123,7 +123,7 @@ as Perl itself.
 use v5.14;
 package Getopt::EX::termcolor;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use warnings;
 use Carp;
